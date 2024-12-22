@@ -4,16 +4,25 @@ namespace App\Exceptions;
 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Throwable;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class Handler extends ExceptionHandler
 {
     /**
-     * The list of the inputs that are never flashed to the session on validation exceptions.
+     * A list of the exception types that are not reported.
+     *
+     * @var array<int, class-string<\Throwable>>
+     */
+    protected $dontReport = [
+        //
+    ];
+
+    /**
+     * A list of the inputs that are never flashed for validation exceptions.
      *
      * @var array<int, string>
      */
     protected $dontFlash = [
-        'current_password',
         'password',
         'password_confirmation',
     ];
@@ -26,5 +35,23 @@ class Handler extends ExceptionHandler
         $this->reportable(function (Throwable $e) {
             //
         });
+    }
+
+    /**
+     * Render an exception into an HTTP response.
+     */
+    public function render($request, Throwable $exception)
+    {
+        // Gestion spécifique des erreurs 404
+        if ($exception instanceof NotFoundHttpException) {
+            return response()->json([
+                'success' => false,
+                'message' => 'La route demandée est introuvable.',
+                'error_code' => 404
+            ], 404);
+        }
+
+        // Retour par défaut
+        return parent::render($request, $exception);
     }
 }

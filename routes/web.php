@@ -16,3 +16,7 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return response()->json(['isgisocs' => '0.1.0']);
 });
+
+Route::get('/docs/api-docs.json', function () {
+    return response()->file(storage_path('api-docs/api-docs.json'));
+});
